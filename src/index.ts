@@ -1,14 +1,36 @@
+import 'dotenv/config';
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
+import swaggerUi from 'swagger-ui-express';
 import { buscarJurisprudencia } from './scraper';
 import { closeBrowser } from './browser';
+import { swaggerSpec } from './swagger';
 import type { BuscaFiltros } from './types';
 
 const app = express();
 const PORT = process.env.PORT ?? 3001;
+const API_KEY = process.env.API_KEY;
+
+if (!API_KEY) {
+  console.error('[API] Variável API_KEY não definida no .env. Encerrando.');
+  process.exit(1);
+}
+
+function autenticar(req: Request, res: Response, next: NextFunction): void {
+  const chave = req.headers['x-api-key'];
+  if (chave !== API_KEY) {
+    res.status(401).json({ erro: 'Não autorizado. Informe um X-API-Key válido.' });
+    return;
+  }
+  next();
+}
 
 app.use(cors());
 app.use(express.json());
+
+// Documentação interativa
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.get('/docs.json', (_req: Request, res: Response) => res.json(swaggerSpec));
 
 // Health check
 app.get('/health', (_req: Request, res: Response) => {
@@ -16,7 +38,7 @@ app.get('/health', (_req: Request, res: Response) => {
 });
 
 // Busca de jurisprudência
-app.post('/buscar', async (req: Request, res: Response, next: NextFunction) => {
+app.post('/buscar', autenticar, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const filtros: BuscaFiltros = req.body;
 
@@ -41,6 +63,7 @@ app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
 
 const server = app.listen(PORT, () => {
   console.log(`[API] Servidor rodando em http://localhost:${PORT}`);
+  console.log(`[API] Documentação disponível em http://localhost:${PORT}/docs`);
 });
 
 // Graceful shutdown
