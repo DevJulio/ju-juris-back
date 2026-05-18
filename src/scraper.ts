@@ -58,9 +58,9 @@ export async function buscarJurisprudencia(filtros: BuscaFiltros): Promise<Respo
     console.log(`[Scraper] Submetendo busca (página ${pageIndex + 1})...`);
     await page.evaluate(`submitForm(${pageIndex})`);
 
-    // Aguarda os resultados aparecerem
+    // Aguarda os resultados aparecerem (document.body pode ser null durante a navegação)
     await page.waitForFunction(
-      () => document.body.innerText.includes('RESULTADOS ENCONTRADOS'),
+      () => document.body?.innerText?.includes('RESULTADOS ENCONTRADOS') ?? false,
       { timeout: 60000 }
     );
 

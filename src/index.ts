@@ -29,8 +29,16 @@ app.use(cors());
 app.use(express.json());
 
 // Documentação interativa
-app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-app.get('/docs.json', (_req: Request, res: Response) => res.json(swaggerSpec));
+app.get('/docs.json', (req: Request, res: Response) => {
+  const protocol = req.headers['x-forwarded-proto'] ?? req.protocol;
+  const host = req.headers['x-forwarded-host'] ?? req.get('host');
+  const spec = {
+    ...swaggerSpec,
+    servers: [{ url: `${protocol}://${host}`, description: 'Servidor atual' }],
+  };
+  res.json(spec);
+});
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(undefined, { swaggerOptions: { url: '/docs.json' } }));
 
 // Health check
 app.get('/health', (_req: Request, res: Response) => {
