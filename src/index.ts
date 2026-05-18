@@ -25,7 +25,14 @@ function autenticar(req: Request, res: Response, next: NextFunction): void {
   next();
 }
 
-app.use(cors());
+const corsOptions = {
+  origin: '*',
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'X-API-Key', 'ngrok-skip-browser-warning'],
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // responde preflight para todas as rotas
 app.use(express.json());
 
 // Documentação interativa
