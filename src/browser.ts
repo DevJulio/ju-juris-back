@@ -8,7 +8,7 @@ export async function getBrowser(): Promise<BrowserContext> {
     console.log('[Browser] Iniciando Chrome do sistema...');
     browser = await chromium.launch({
       headless: true,
-      executablePath: '/usr/bin/google-chrome',
+      executablePath: process.env.CHROMIUM_PATH ?? '/usr/bin/chromium-browser',
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',

@@ -1,0 +1,29 @@
+[Unit]
+Description=JuJuris Backend - Scraper de Jurisprudência TJGO
+Documentation=https://github.com/SEU_USUARIO/jujuris-back
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=jujuris
+WorkingDirectory=/opt/jujuris-back
+EnvironmentFile=/opt/jujuris-back/.env
+ExecStart=/usr/bin/node /opt/jujuris-back/dist/index.js
+Restart=on-failure
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=jujuris-back
+
+# Limites de recursos (Playwright + Chromium podem ser pesados)
+LimitNOFILE=65536
+MemoryMax=3G
+
+# Segurança
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+
+[Install]
+WantedBy=multi-user.target

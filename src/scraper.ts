@@ -105,20 +105,20 @@ export async function buscarJurisprudencia(filtros: BuscaFiltros): Promise<Respo
                           link.parentElement?.parentElement?.parentElement;
         if (!container) return;
 
-        const texto = container.innerText ?? '';
-        const linhas = texto.split('\n').map(l => l.trim()).filter(Boolean);
+        const texto = (container as HTMLElement).innerText ?? '';
+        const linhas: string[] = texto.split('\n').map((l: string) => l.trim()).filter(Boolean);
 
         // Linha 0: número do processo (remove lixo de botões)
         const rawNum = linhas[0] ?? '';
         const numMatch = rawNum.match(/\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}/);
         const numProcesso = numMatch ? numMatch[0] : '';
         // Linha 1 (após "Baixar Inteiro teor  Copiar"): unidade
-        const unidadeIdx = linhas.findIndex(l => l.length > 10 && !l.includes('Baixar') && !l.includes('Copiar') && linhas.indexOf(l) > 0);
+        const unidadeIdx = linhas.findIndex((l: string) => l.length > 10 && !l.includes('Baixar') && !l.includes('Copiar') && linhas.indexOf(l) > 0);
         const unidade = linhas[unidadeIdx] ?? '';
         const magistrado = linhas[unidadeIdx + 1] ?? '';
         const tipoAto = linhas[unidadeIdx + 2] ?? '';
-        const dataPublicacao = linhas.find(l => /Publicado em/i.test(l)) ?? '';
-        const textoIdx = linhas.findIndex(l => /Publicado em/i.test(l));
+        const dataPublicacao = linhas.find((l: string) => /Publicado em/i.test(l)) ?? '';
+        const textoIdx = linhas.findIndex((l: string) => /Publicado em/i.test(l));
         const textoDecisao = linhas.slice(textoIdx + 1).join('\n').slice(0, 2000);
 
         if (numProcesso && /\d{7}-\d{2}\.\d{4}/.test(numProcesso)) {
