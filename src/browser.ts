@@ -9,12 +9,14 @@ export async function getBrowser(): Promise<BrowserContext> {
     const proxyUsername = process.env.PROXY_USERNAME;
     const proxyPassword = process.env.PROXY_PASSWORD;
 
-    console.log('[Browser] Iniciando Chrome do sistema...');
+    const executablePath = process.env.CHROMIUM_PATH;
+
+    console.log(`[Browser] Iniciando Chromium${executablePath ? ` em ${executablePath}` : ' do Playwright'}...`);
     if (proxyServer) console.log(`[Browser] Usando proxy: ${proxyServer}`);
 
     browser = await chromium.launch({
       headless: true,
-      executablePath: process.env.CHROMIUM_PATH ?? '/usr/bin/chromium-browser',
+      executablePath,
       proxy: proxyServer
         ? { server: proxyServer, username: proxyUsername, password: proxyPassword }
         : undefined,

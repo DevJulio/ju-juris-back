@@ -26,12 +26,28 @@ export const swaggerSpec: OpenAPIV3.Document = {
     schemas: {
       BuscaFiltros: {
         type: 'object',
-        description: 'Filtros de busca de jurisprudência. Ao menos `texto` ou `numeroProcesso` é obrigatório.',
+        description: 'Filtros de busca de jurisprudência. Ao menos um filtro de pesquisa deve ser informado.',
         properties: {
           texto: {
             type: 'string',
             description: 'Palavra-chave ou trecho para busca no texto das decisões.',
             example: 'dano moral',
+          },
+          campoPesquisa: {
+            type: 'string',
+            description:
+              'Filtro legado do módulo antigo. No PROJUDI novo, alguns valores são mapeados para filtros equivalentes.',
+            enum: [
+              'todos',
+              'recursoProcCnj',
+              'descricaoRecurso',
+              'decisao',
+              'ementa',
+              'relator',
+              'comarca',
+              'dataAcordao',
+            ],
+            example: 'ementa',
           },
           instancia: {
             type: 'string',
@@ -55,15 +71,30 @@ export const swaggerSpec: OpenAPIV3.Document = {
             description: 'Nome da unidade judiciária.',
             example: '',
           },
+          unidadeId: {
+            type: 'string',
+            description: 'ID interno da unidade no PROJUDI, quando conhecido.',
+            example: '',
+          },
           magistrado: {
             type: 'string',
             description: 'Nome do magistrado.',
+            example: '',
+          },
+          magistradoId: {
+            type: 'string',
+            description: 'ID interno do magistrado no PROJUDI, quando conhecido.',
             example: '',
           },
           tipoAto: {
             type: 'string',
             description: 'Tipo do ato (ex: Acórdão, Sentença).',
             example: 'Acórdão',
+          },
+          tipoAtoId: {
+            type: 'string',
+            description: 'ID interno do tipo de ato no PROJUDI, quando conhecido.',
+            example: '',
           },
           numeroProcesso: {
             type: 'string',
@@ -122,7 +153,7 @@ export const swaggerSpec: OpenAPIV3.Document = {
       ErroResposta: {
         type: 'object',
         properties: {
-          erro: { type: 'string', example: 'Informe ao menos "texto" ou "numeroProcesso".' },
+          erro: { type: 'string', example: 'Informe ao menos um filtro de pesquisa.' },
         },
       },
     },
@@ -156,7 +187,7 @@ export const swaggerSpec: OpenAPIV3.Document = {
         summary: 'Buscar jurisprudências',
         description:
           'Realiza uma busca de jurisprudências no PROJUDI (TJGO) com base nos filtros informados.\n\n' +
-          'Ao menos um dos campos `texto` ou `numeroProcesso` deve ser preenchido.\n\n' +
+          'Ao menos um filtro de pesquisa deve ser preenchido.\n\n' +
           '> ⚠️ A operação pode levar alguns segundos pois aciona um navegador em background.',
         tags: ['Jurisprudência'],
         security: [{ ApiKeyAuth: [] }],

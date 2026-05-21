@@ -57,8 +57,25 @@ app.post('/buscar', autenticar, async (req: Request, res: Response, next: NextFu
   try {
     const filtros: BuscaFiltros = req.body;
 
-    if (!filtros.texto && !filtros.numeroProcesso) {
-      res.status(400).json({ erro: 'Informe ao menos "texto" ou "numeroProcesso".' });
+    const campoPesquisaComFiltroProprio = filtros.campoPesquisa === 'ementa' || filtros.campoPesquisa === 'decisao';
+    const temAlgumFiltro = campoPesquisaComFiltroProprio || [
+      filtros.texto,
+      filtros.instancia,
+      filtros.area,
+      filtros.orgaoMateria,
+      filtros.unidade,
+      filtros.unidadeId,
+      filtros.magistrado,
+      filtros.magistradoId,
+      filtros.tipoAto,
+      filtros.tipoAtoId,
+      filtros.numeroProcesso,
+      filtros.dataInicial,
+      filtros.dataFinal,
+    ].some((valor) => typeof valor === 'string' && valor.trim() !== '');
+
+    if (!temAlgumFiltro) {
+      res.status(400).json({ erro: 'Informe ao menos um filtro de pesquisa.' });
       return;
     }
 
